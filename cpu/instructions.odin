@@ -73,6 +73,28 @@ lda_indexed_indirect :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
 }
 
 /*
+    Load X register, immediate value
+    LDX #
+    0xA2
+*/
+ldx_immediate :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
+    bus := bus
+
+    switch cpu.ir.counter {
+    case 0:
+        bus.addr = cpu.pc
+        cpu.pc += 1
+
+    case 1:
+        cpu.x = bus.data
+        set_nz(cpu, cpu.x)
+        bus = fetch(cpu, bus)
+    }
+
+    return bus
+}
+
+/*
     Load accumulator, zero page
     LDA zp
     0xA5
@@ -145,6 +167,48 @@ lda_absolute :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
         set_nz(cpu, cpu.a)
         bus = fetch(cpu, bus)
 
+    }
+
+    return bus
+}
+
+/*
+    Load accumulator, indirect indexed
+    LDA (zp),Y
+    0xB1
+*/
+lda_indirect_indexed :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
+    bus := bus
+
+    switch cpu.ir.counter {
+    case 0: // setup to read ZP offset
+        bus.addr = cpu.pc
+        cpu.pc += 1
+
+    case 1: // read ZP offset and set address bus
+        bus.addr = u16(bus.data)
+
+    case 2: // read low byte
+        cpu.ad = u16(bus.data)
+        bus.addr += 1
+
+    case 3: // read high byte
+        cpu.ad |= u16(bus.data) << 8
+        al := u8(cpu.ad) + cpu.y
+        ah := u8(cpu.ad >> 8)
+        bus.addr = u16(ah << 8) | u16(al)
+
+        if al >= u8(cpu.ad) { // page boundary NOT crossed
+            cpu.ir.counter += 1 // skip cycle 4
+        }
+
+    case 4: // page boundary crossed
+        bus.addr = cpu.ad + u16(cpu.y) // set corrected address
+
+    case 5:
+        cpu.a = bus.data
+        set_nz(cpu, cpu.a)
+        bus = fetch(cpu, bus)
     }
 
     return bus
