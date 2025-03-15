@@ -2,6 +2,7 @@ package cpu
 
 import "core:log"
 
+// reset routine
 _reset :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -35,7 +36,11 @@ _reset :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// A5
+/*
+    Load accumulator, zero page
+    LDA zp
+    0xA5
+*/
 lda_zero_page :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -56,7 +61,11 @@ lda_zero_page :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// A9
+/*
+    Load accumulator, immediate value
+    LDA #
+    0xA9
+*/
 lda_immediate :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -74,7 +83,11 @@ lda_immediate :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// AD
+/*
+    Load accumulator, absolute
+    LDA abs
+    0xAD
+*/
 lda_absolute :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -101,7 +114,11 @@ lda_absolute :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// B5
+/*
+    Load accumulator, zero page with X offset
+    LDA zp,X
+    0xB5
+*/
 lda_zero_page_x :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -126,7 +143,11 @@ lda_zero_page_x :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// B9
+/*
+    Load accumulator, absolute with Y offset
+    LDA abs,Y
+    0xB9
+*/
 lda_absolute_y :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
@@ -166,7 +187,11 @@ lda_absolute_y :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     return bus
 }
 
-// BD
+/*
+    Load accumulator, absolute with X offset
+    LDA abs,X
+    0xBD
+*/
 lda_absolute_x :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
     bus := bus
 
