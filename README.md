@@ -1,4 +1,4 @@
-# m6502
+# emu65
 
 This an unfinished (barely started, really) 6502 emulator implemented in Odin.
 
