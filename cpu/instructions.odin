@@ -37,6 +37,42 @@ _reset :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
 }
 
 /*
+    Load accumulator, indexed indirect
+    LDA (zp,X)
+    0xA1
+*/
+lda_indexed_indirect :: proc(cpu: ^Cpu, bus: Bus) -> Bus {
+    bus := bus
+
+    switch cpu.ir.counter {
+    case 0: // set the addr bus to read the zero page address from the next byte
+        bus.addr = cpu.pc
+        cpu.pc += 1
+
+    case 1: // set the addr bus to the zero page address byte from the instruction
+        bus.addr = u16(bus.data)
+
+    case 2: // add the X register to the current address, wrapping to stay within the zero page
+        addr := u8(bus.addr) + cpu.x
+        bus.addr = u16(addr)
+
+    case 3: // read the low byte of the target address and increment the address bus
+        cpu.ad = u16(bus.data)
+        bus.addr += 1
+
+    case 4: // read the high byte of the target address
+        bus.addr =  u16(bus.data) << 8 | cpu.ad
+
+    case 5: // read from the target address and store in the accumulator
+        cpu.a = bus.data
+        set_nz(cpu, cpu.a)
+        bus = fetch(cpu, bus)
+    }
+
+    return bus
+}
+
+/*
     Load accumulator, zero page
     LDA zp
     0xA5
